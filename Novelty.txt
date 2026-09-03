@@ -1,0 +1,26 @@
+Looking at your report against the Weber et al. (2019) base paper, here are the key novelties:
+
+**Architecture & Models**
+- Base paper uses GCN/Skip-GCN; your report introduces GAT with multi-head attention, which captures weighted neighbourhood relationships rather than uniform aggregation
+- You propose SGAT-BC — a novel Subtree Graph Attention Network with two sequential GATConv passes per layer, encoding two-hop context at one-hop computational cost, which has no equivalent in the base paper
+- The sigmoid gating mechanism in SGATLayer to combat over-smoothing is entirely new
+
+**Ensemble & Hybrid Stacking**
+- Base paper only briefly suggests augmenting RF with GCN embeddings as future work; your report fully implements and evaluates a 273-dimensional hybrid stacking pipeline combining SGAT embeddings, soft probabilities, graph topology features, and baseline predictions fed into CatBoost + XGBoost soft voting
+- Bootstrapped bagging of 5 independent SGAT instances for variance reduction is a new contribution
+
+**Class Imbalance Handling**
+- Base paper uses simple weighted cross-entropy; your report introduces label smoothing (ε = 0.05) combined with class weighting, plus a dedicated F2-optimised threshold tuning procedure over [0.20, 0.75]
+
+**Graph Feature Engineering**
+- Your report introduces 7 leakage-safe topology features (fan-in/out ratio, 2-hop illicit ratio, clustering coefficient etc.) computed strictly on the training subgraph — the base paper has no equivalent
+
+**Explainability**
+- Base paper offers only a visualisation prototype (Chronograph); your report applies GNNExplainer with a formal AML typology mapping framework (Fan-out, Fan-in, Layering, Pass-through, Structuring) across 30+ nodes with quantitative feature attribution comparison between GAT and RF
+
+**Training Improvements**
+- Cosine Annealing Warm Restarts scheduler, AdamW with weight decay, and gradient clipping are all absent from the base paper
+- CatBoost as a baseline (with log-loss + F1 eval metric) is new; base paper only uses LR, RF, MLP, GCN
+
+**Evaluation**
+- Base paper reports aggregate metrics only; your report adds per-timestep F1 breakdown across all 15 test steps for every model, with explicit analysis of the dark market shutdown at t=43 rather than just noting it as a challenge
